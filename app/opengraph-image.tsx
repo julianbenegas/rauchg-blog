@@ -2,7 +2,7 @@ export const runtime = "edge";
 export const revalidate = 60;
 
 import { ImageResponse } from "next/server";
-import { getPosts } from "@/app/get-posts";
+import { getBaseHubPostsMeta } from "@/app/basehub/queries";
 
 export default async function MainOG() {
   // fonts
@@ -27,7 +27,7 @@ export default async function MainOG() {
     )
   ).then(res => res.arrayBuffer());
 
-  const posts = await getPosts();
+  const posts = await getBaseHubPostsMeta();
 
   return new ImageResponse(
     (
@@ -52,7 +52,7 @@ export default async function MainOG() {
 
           {posts.map((post, i) => (
             <div
-              key={post.id}
+              key={post._id}
               tw="flex py-6 text-[26px] border-gray-300 border-t w-full"
             >
               <div tw="flex text-gray-400 w-24">
@@ -61,7 +61,7 @@ export default async function MainOG() {
                   ? getYear(post.date)
                   : ""}
               </div>
-              <div tw="flex grow">{post.title}</div>
+              <div tw="flex grow">{post._title}</div>
               <div tw="flex text-gray-400 pl-7">{post?.viewsFormatted}</div>
             </div>
           ))}

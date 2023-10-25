@@ -4,12 +4,17 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Suspense } from "react";
 import useSWR from "swr";
+import { BaseHubPostMeta, WithViews } from "./basehub/queries";
 
 type SortSetting = ["date" | "views", "desc" | "asc"];
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export function Posts({ posts: initialPosts }) {
+export function Posts({
+  posts: initialPosts,
+}: {
+  posts: Array<WithViews<BaseHubPostMeta>>;
+}) {
   const [sort, setSort] = useState<SortSetting>(["date", "desc"]);
   const { data: posts } = useSWR("/api/posts", fetcher, {
     fallbackData: initialPosts,
@@ -69,7 +74,13 @@ export function Posts({ posts: initialPosts }) {
   );
 }
 
-function List({ posts, sort }) {
+function List({
+  posts,
+  sort,
+}: {
+  posts: Array<WithViews<BaseHubPostMeta>>;
+  sort: SortSetting;
+}) {
   // sort can be ["date", "desc"] or ["views", "desc"] for example
   const sortedPosts = useMemo(() => {
     const [sortKey, sortDirection] = sort;
@@ -94,8 +105,8 @@ function List({ posts, sort }) {
           !sortedPosts[i + 1] || getYear(sortedPosts[i + 1].date) !== year;
 
         return (
-          <li key={post.id}>
-            <Link href={`/${new Date(post.date).getFullYear()}/${post.id}`}>
+          <li key={post._id}>
+            <Link href={`/bshb-post/${post._slug}`}>
               <span
                 className={`flex transition-[background-color] hover:bg-gray-100 dark:hover:bg-[#242424] active:bg-gray-200 dark:active:bg-[#222] border-y border-gray-200 dark:border-[#313131]
                 ${!firstOfYear ? "border-t-0" : ""}
@@ -113,7 +124,7 @@ function List({ posts, sort }) {
                     </span>
                   )}
 
-                  <span className="grow dark:text-gray-100">{post.title}</span>
+                  <span className="grow dark:text-gray-100">{post._title}</span>
 
                   <span className="text-gray-500 dark:text-gray-500 text-xs">
                     {post.viewsFormatted}

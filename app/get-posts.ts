@@ -11,7 +11,7 @@ export type Post = {
 };
 
 // shape of the HSET in redis
-type Views = {
+export type Views = {
   [key: string]: string;
 };
 
